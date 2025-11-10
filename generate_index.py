@@ -4,66 +4,85 @@ from pathlib import Path
 from datetime import datetime
 
 # --- Configuration ---
-DOWNLOAD_DIR = Path(".")          # Scan the entire repo root
-OUTPUT_FILE = Path("index.html")  # Output HTML file
+ROOT_DIR = Path(".")  # Where to start scanning
+IGNORED_PREFIXES = ["."]  # Ignore hidden folders/files
 
 # --- Helpers ---
 def human_size(size_bytes):
     """Convert bytes to human-readable format"""
-    for unit in ['B','KB','MB','GB','TB']:
+    for unit in ["B", "KB", "MB", "GB", "TB"]:
         if size_bytes < 1024:
             return f"{size_bytes:.1f} {unit}"
         size_bytes /= 1024
     return f"{size_bytes:.1f} PB"
 
-def generate_file_list(base_path, relative_path=""):
-    """Recursively list files with size and modified date"""
-    html = ""
-    for f in sorted(base_path.iterdir()):
-        # Skip hidden folders/files
-        if f.name.startswith("."):
+def list_dir(directory: Path, rel_path=""):
+    """Generate HTML file list for a single directory"""
+    entries = []
+    for entry in sorted(directory.iterdir()):
+        if any(entry.name.startswith(p) for p in IGNORED_PREFIXES):
             continue
+        entries.append(entry)
+    return entries
 
-        f_rel = relative_path + f.name
-        if f.is_file():
-            size = human_size(f.stat().st_size)
-            mtime = datetime.fromtimestamp(f.stat().st_mtime).strftime("%Y-%m-%d %H:%M:%S")
-            html += f'    <li><a href="{f_rel}" download>{f_rel}</a> — {size}, modified {mtime}</li>\n'
-        elif f.is_dir():
-            html += f'    <li><strong>{f_rel}/</strong></li>\n'
-            html += generate_file_list(f, f_rel + "/")
-    return html
+def generate_html(directory: Path, rel_path=""):
+    """Generate index.html for one directory"""
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-# --- Generate HTML ---
-now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-html = f"""<!DOCTYPE html>
+    entries = list_dir(directory, rel_path)
+    html = f"""<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Meowcat Files - files.meowcat.site</title>
+    <title>Index of /{rel_path}</title>
     <style>
         body {{ font-family: sans-serif; padding: 2rem; }}
-        h1 {{ text-align: center; }}
+        h1 {{ margin-bottom: 1rem; }}
         ul {{ list-style: none; padding: 0; }}
         li {{ margin: 0.5rem 0; }}
         a {{ text-decoration: none; color: #007acc; }}
         a:hover {{ text-decoration: underline; }}
+        .info {{ color: #666; font-size: 0.9em; }}
     </style>
 </head>
 <body>
-<h1>Meowcat Files - files.meowcat.site</h1>
-<p><em>This page was last generated at: {now}</em></p>
+<h1>Index of /{rel_path}</h1>
+<p class="info">Generated on {now}</p>
 <ul>
 """
 
-html += generate_file_list(DOWNLOAD_DIR)
-html += """
+    # Add parent link if not at root
+    if rel_path:
+        html += f'    <li><a href="../">../</a></li>\n'
+
+    # Add directories first
+    for entry in entries:
+        if entry.is_dir():
+            html += f'    <li><a href="{entry.name}/">{entry.name}/</a></li>\n'
+
+    # Add files
+    for entry in entries:
+        if entry.is_file():
+            size = human_size(entry.stat().st_size)
+            mtime = datetime.fromtimestamp(entry.stat().st_mtime).strftime("%Y-%m-%d %H:%M:%S")
+            html += f'    <li><a href="{entry.name}" download>{entry.name}</a> — {size}, modified {mtime}</li>\n'
+
+    html += """
 </ul>
 </body>
 </html>
 """
+    (directory / "index.html").write_text(html)
+    print(f"Generated {directory / 'index.html'}")
 
-# --- Write to file ---
-OUTPUT_FILE.write_text(html)
-print(f"Generated {OUTPUT_FILE} with all files in {DOWNLOAD_DIR}")
+def generate_all(directory: Path, rel_path=""):
+    """Recursively generate index.html for every directory"""
+    generate_html(directory, rel_path)
+    for entry in directory.iterdir():
+        if entry.is_dir() and not any(entry.name.startswith(p) for p in IGNORED_PREFIXES):
+            generate_all(entry, rel_path + entry.name + "/")
+
+# --- Main ---
+if __name__ == "__main__":
+    generate_all(ROOT_DIR)
+    print(" Yay! All index.html files generated successfully.")
