@@ -1,17 +1,39 @@
+#!/usr/bin/env python3
 import os
 from pathlib import Path
 from datetime import datetime
 
-DOWNLOAD_DIR = Path("downloads")
-OUTPUT_FILE = Path("index.html")
+# --- Configuration ---
+DOWNLOAD_DIR = Path("downloads")    # folder with files
+OUTPUT_FILE = Path("index.html")    # output HTML file
 
-files = sorted(DOWNLOAD_DIR.iterdir())
+# --- Helpers ---
+def human_size(size_bytes):
+    """Convert bytes to human-readable format"""
+    for unit in ['B','KB','MB','GB','TB']:
+        if size_bytes < 1024:
+            return f"{size_bytes:.1f} {unit}"
+        size_bytes /= 1024
+    return f"{size_bytes:.1f} PB"
 
-# Get the current timestamp
+def generate_file_list(base_path, relative_path=""):
+    """Recursively list files with size and modified date"""
+    html = ""
+    for f in sorted(base_path.iterdir()):
+        f_rel = relative_path + f.name
+        if f.is_file():
+            size = human_size(f.stat().st_size)
+            mtime = datetime.fromtimestamp(f.stat().st_mtime).strftime("%Y-%m-%d %H:%M:%S")
+            html += f'    <li><a href="{DOWNLOAD_DIR}/{f_rel}">{f_rel}</a> — {size}, modified {mtime}</li>\n'
+        elif f.is_dir():
+            html += f'    <li><strong>{f_rel}/</strong></li>\n'
+            html += generate_file_list(f, f_rel + "/")
+    return html
+
+# --- Generate HTML ---
 now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-html = f"""
-<!DOCTYPE html>
+html = f"""<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
@@ -31,15 +53,13 @@ html = f"""
 <ul>
 """
 
-for f in files:
-    if f.is_file():
-        html += f'    <li><a href="{DOWNLOAD_DIR}/{f.name}">{f.name}</a></li>\n'
-
+html += generate_file_list(DOWNLOAD_DIR)
 html += """
 </ul>
 </body>
 </html>
 """
 
+# --- Write to file ---
 OUTPUT_FILE.write_text(html)
-print(f"Generated {OUTPUT_FILE} with {len(files)} files.")
+print(f"Generated {OUTPUT_FILE} with all files in {DOWNLOAD_DIR}")
