@@ -4,8 +4,8 @@ from pathlib import Path
 from datetime import datetime
 
 # --- Configuration ---
-DOWNLOAD_DIR = Path("downloads")    # folder with files
-OUTPUT_FILE = Path("index.html")    # output HTML file
+DOWNLOAD_DIR = Path(".")          # Scan the entire repo root
+OUTPUT_FILE = Path("index.html")  # Output HTML file
 
 # --- Helpers ---
 def human_size(size_bytes):
@@ -20,11 +20,15 @@ def generate_file_list(base_path, relative_path=""):
     """Recursively list files with size and modified date"""
     html = ""
     for f in sorted(base_path.iterdir()):
+        # Skip hidden folders/files
+        if f.name.startswith("."):
+            continue
+
         f_rel = relative_path + f.name
         if f.is_file():
             size = human_size(f.stat().st_size)
             mtime = datetime.fromtimestamp(f.stat().st_mtime).strftime("%Y-%m-%d %H:%M:%S")
-            html += f'    <li><a href="{DOWNLOAD_DIR}/{f_rel}">{f_rel}</a> — {size}, modified {mtime}</li>\n'
+            html += f'    <li><a href="{f_rel}" download>{f_rel}</a> — {size}, modified {mtime}</li>\n'
         elif f.is_dir():
             html += f'    <li><strong>{f_rel}/</strong></li>\n'
             html += generate_file_list(f, f_rel + "/")
