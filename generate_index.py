@@ -48,6 +48,7 @@ def generate_html(directory: Path, rel_path=""):
 <body>
 <h1>Index of /{rel_path}</h1>
 <p class="info">Generated on {now}</p>
+<p class="info">files.meowcat.site</p>
 <ul>
 """
 
