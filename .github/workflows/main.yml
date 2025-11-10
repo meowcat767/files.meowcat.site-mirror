@@ -1,4 +1,6 @@
 name: Build File Index
+permissions:
+  contents: write
 
 on:
   push:
@@ -21,16 +23,11 @@ jobs:
         with:
           python-version: '3.x'
 
-      # Step 3: Install dependencies (optional)
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt || echo "No requirements"
-
-      # Step 4: Run the enhanced index generator
+      # Step 3: Run the enhanced index generator
       - name: Generate index.html
         run: python3 generate_index.py
 
-      # Step 5: Commit and push updated index.html
+      # Step 4: Commit and push updated index.html
       - name: Commit and push changes
         run: |
           git config user.name "GitHub Actions"
