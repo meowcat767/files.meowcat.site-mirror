@@ -4,7 +4,7 @@ from pathlib import Path
 from datetime import datetime
 
 # --- Configuration ---
-DOWNLOAD_DIR = Path(".")    # folder with files
+DOWNLOAD_DIR = Path("downloads")    # folder with files
 OUTPUT_FILE = Path("index.html")    # output HTML file
 
 # --- Helpers ---
