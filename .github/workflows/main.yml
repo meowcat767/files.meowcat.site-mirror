@@ -30,8 +30,12 @@ jobs:
       # Step 4: Commit and push updated index.html
       - name: Commit and push changes
         run: |
-          git config user.name "GitHub Actions"
+          git config user.name "Meowcat Files Manager"
           git config user.email "actions@github.com"
-          git add index.html
-          git diff --cached --quiet || git commit -m "Update index.html [skip ci]"
-          git push
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "Update index.html files [skip ci]"
+            git push
+          else
+            echo "No changes to commit."
+          fi
