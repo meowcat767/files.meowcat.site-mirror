@@ -1,0 +1,40 @@
+name: Build File Index
+
+on:
+  push:
+    paths:
+      - 'downloads/**'   # Trigger only when files in downloads/ change
+      - 'generate_index.py'  # Trigger if you modify the script itself
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the repo
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      # Step 3: Install dependencies (optional)
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt || echo "No requirements"
+
+      # Step 4: Run the enhanced index generator
+      - name: Generate index.html
+        run: python3 generate_index.py
+
+      # Step 5: Commit and push updated index.html
+      - name: Commit and push changes
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add index.html
+          git diff --cached --quiet || git commit -m "Update index.html [skip ci]"
+          git push
