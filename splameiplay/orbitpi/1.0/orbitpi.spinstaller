@@ -1,0 +1,11 @@
+Version=1.1
+Type=Installer
+TypeVersion=1.1
+
+Name=OrbitPi
+Author=meowcat767
+
+ExeName=OrbitPi.bat
+Url=https://cdn.meowcat.site/splameiplay/orbitpi/1.0/orbitpi.splameiplay/
+NoticesUrl=https://github.com/meowcat767/OrbitPi
+ProjectUrl=https://github.com/meowcat767/OrbitPi
