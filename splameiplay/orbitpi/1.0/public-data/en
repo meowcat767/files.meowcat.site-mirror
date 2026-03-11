@@ -1,0 +1,20 @@
+Version=1.1
+Type=ProjectPublicData
+TypeVersion=1.0
+
+DescriptionShort=This would indeed make any person rage.
+DescriptionLong=OrbitPi... the game about... pi. Bugs are only patched if they crash the game. Most people can't get past the first few digits.
+Locale=en,ja
+Author=Developer + Publisher: meowcat767
+TermsShort=Splamei Project TOS
+TermsLong=This project is licensed under the Splamei Project TOS. For information about the terms, please check them out here: https://www.veemo.uk/splamei-project-tos/
+
+/Windows
+Specs=Windows 10 20H2 or later\n1.5GB RAM\n2GHz CPU Clock speed\nOpenGL 4.5
+
+/AgeRating
+Age=7
+
+/Urls
+NoticeUrl=https://github.com/meowcat767/OrbitPi
+MoreInfoUrl=https://github.com/meowcat767/OrbitPi

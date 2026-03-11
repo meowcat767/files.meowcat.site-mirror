@@ -1,0 +1,10 @@
+Version=1.1
+Type=ProjectReleaseData
+TypeVersion=1.0
+
+Hash=a03b64b33e74e58089c1c9061bbfb963c58fa9ede8ee9b2d8d50e4bd3d8805e2
+ExeName=OrbitPi.bat
+
+Downloadable=true
+Released=true
+DynamicDownloadable=false
